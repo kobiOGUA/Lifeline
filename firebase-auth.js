@@ -104,8 +104,24 @@ async function loadUserData(uid) {
     // Skip to dashboard immediately
     if (window.navigateTo) window.navigateTo('screen-dashboard');
   } else {
-    // New user, push to registration
-    if (window.navigateTo) window.navigateTo('screen-register');
+    // New user in the cloud! Have they already been using the app offline?
+    if (window.userProfile && window.userProfile.name) {
+      // Absorb their local profile into their new cloud account!
+      if (window.triggerCloudSync) window.triggerCloudSync();
+      if (window.navigateTo) window.navigateTo('screen-dashboard');
+      if (window.showToast) window.showToast('Offline profile synced to cloud!');
+    } else {
+      // Truly new user: Prefill name from Google/Email profile if possible
+      const nameField = document.getElementById('reg-name');
+      if (nameField && window.currentUser) {
+        if (window.currentUser.displayName) {
+          nameField.value = window.currentUser.displayName;
+        } else if (window.currentUser.email) {
+          nameField.value = window.currentUser.email.split('@')[0];
+        }
+      }
+      if (window.navigateTo) window.navigateTo('screen-register');
+    }
   }
 }
 
