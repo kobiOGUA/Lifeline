@@ -1,0 +1,838 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Lifeline – AI Health Assistant | Babcock University</title>
+  <meta name="description"
+    content="Lifeline is an offline-first, AI-powered health assistant built for Nigeria. Symptom analysis, medication reminders, digital health vault, and nearby care — anytime, anywhere." />
+  <meta name="theme-color" content="#4A90E2" />
+  <meta name="mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="default" />
+  <meta name="apple-mobile-web-app-title" content="Lifeline" />
+
+  <!-- Open Graph -->
+  <meta property="og:title" content="Lifeline – AI Health Assistant" />
+  <meta property="og:description"
+    content="Your personal health bridge — anytime, anywhere. Powered by AI. Built for Nigeria." />
+  <meta property="og:type" content="website" />
+
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link
+    href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Outfit:wght@400;600;700;800&display=swap"
+    rel="stylesheet" />
+
+  <!-- Firebase Import Map (Allows raw ES Modules instantly) -->
+  <script type="importmap">
+    {
+      "imports": {
+        "firebase/app": "https://www.gstatic.com/firebasejs/10.9.0/firebase-app.js",
+        "firebase/analytics": "https://www.gstatic.com/firebasejs/10.9.0/firebase-analytics.js",
+        "firebase/auth": "https://www.gstatic.com/firebasejs/10.9.0/firebase-auth.js",
+        "firebase/firestore": "https://www.gstatic.com/firebasejs/10.9.0/firebase-firestore.js"
+      }
+    }
+  </script>
+
+  <link rel="stylesheet" href="style.css" />
+</head>
+
+<body>
+
+  <div id="app-root">
+
+    <!-- ======== SPLASH / LANDING SCREEN ======== -->
+    <div id="screen-splash" class="screen active">
+      <div class="splash-bg">
+        <div class="splash-blob blob1"></div>
+        <div class="splash-blob blob2"></div>
+        <div class="splash-blob blob3"></div>
+      </div>
+      <div class="splash-content">
+        <div class="logo-wrap">
+          <div class="logo-icon">
+            <svg viewBox="0 0 60 60" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path
+                d="M10 22C10 15.37 15.37 10 22 10C25.31 10 28.31 11.34 30 13.6C31.69 11.34 34.69 10 38 10C44.63 10 50 15.37 50 22C50 35 30 50 30 50C30 50 10 35 10 22Z"
+                fill="url(#heartGrad)" />
+              <polyline points="18,27 23,22 27,30 31,18 35,27 42,27" stroke="white" stroke-width="2.5"
+                stroke-linecap="round" stroke-linejoin="round" />
+              <defs>
+                <linearGradient id="heartGrad" x1="10" y1="10" x2="50" y2="50" gradientUnits="userSpaceOnUse">
+                  <stop offset="0%" stop-color="#4A90E2" />
+                  <stop offset="100%" stop-color="#2BC3A3" />
+                </linearGradient>
+              </defs>
+            </svg>
+          </div>
+          <div class="logo-text">
+            <h1>Lifeline</h1>
+            <span>AI Health Assistant</span>
+          </div>
+        </div>
+        <p class="splash-tagline">Your personal health bridge — anytime, anywhere.</p>
+        <p class="splash-sub">Powered by AI · Built for Nigeria · Offline-First</p>
+        
+        <div style="display:flex; flex-direction:column; gap:12px; margin-top:12px; width:100%; max-width:280px;">
+          <button class="btn-primary btn-full" style="padding:16px 40px; font-size:1.05rem;" onclick="if(window.signInGuest) window.signInGuest(); else navigateTo('screen-onboard');">Get Started (Guest) →</button>
+          
+          <button class="btn-secondary btn-full" style="padding:16px 40px; font-size:.95rem; gap:10px; display:flex; align-items:center; justify-content:center;" onclick="if(window.signInWithGoogle) window.signInWithGoogle()">
+            <svg viewBox="0 0 24 24" width="20" height="20" xmlns="http://www.w3.org/2000/svg"><path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"/><path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/><path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z" fill="#FBBC05"/><path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335"/></svg>
+            Google Login
+          </button>
+          
+          <button class="btn-ghost btn-full" style="margin-top:0; padding:12px; font-size:.95rem; display:flex; align-items:center; justify-content:center; gap:8px;" onclick="document.getElementById('email-auth-modal').classList.add('open')">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
+            Email & Password
+          </button>
+        </div>
+
+        <div class="splash-badges" style="margin-top:16px;">
+          <span class="badge">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
+            </svg>
+            NDPR Compliant
+          </span>
+          <span class="badge">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path
+                d="M22 16.92v3a2 2 0 01-2.18 2 19.79 19.79 0 01-8.63-3.07A19.5 19.5 0 013.07 9.8 19.79 19.79 0 01.06 1.18 2 2 0 012 .02h3a2 2 0 012 1.72c.127.96.361 1.903.7 2.81a2 2 0 01-.45 2.11L6.09 7.91a16 16 0 006 6l1.27-1.27a2 2 0 012.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0122 14.92v2z" />
+            </svg>
+            Offline Ready
+          </span>
+          <span class="badge">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <circle cx="12" cy="12" r="10" />
+              <polyline points="12 6 12 12 16 14" />
+            </svg>
+            24/7 Support
+          </span>
+        </div>
+        <p class="splash-team">Lifeline Team · Babcock University</p>
+      </div>
+    </div>
+
+    <!-- ======== ONBOARDING SCREEN ======== -->
+    <div id="screen-onboard" class="screen">
+      <div class="onboard-slides">
+        <div class="onboard-slide active" id="slide-0">
+          <div class="onboard-illus illus-1">
+            <svg viewBox="0 0 200 160" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <rect x="40" y="20" width="120" height="110" rx="16" fill="#EAF6F6" />
+              <rect x="60" y="40" width="80" height="12" rx="6" fill="#2BC3A3" opacity="0.7" />
+              <rect x="60" y="62" width="60" height="8" rx="4" fill="#4A90E2" opacity="0.5" />
+              <rect x="60" y="80" width="70" height="8" rx="4" fill="#4A90E2" opacity="0.3" />
+              <rect x="60" y="98" width="50" height="8" rx="4" fill="#4A90E2" opacity="0.2" />
+              <circle cx="155" cy="45" r="24" fill="url(#g1)" />
+              <path
+                d="M147 45C147 40.58 150.58 37 155 37C159.42 37 163 40.58 163 45C163 52 155 57 155 57C155 57 147 52 147 45Z"
+                fill="white" />
+              <defs>
+                <linearGradient id="g1" x1="131" y1="21" x2="179" y2="69" gradientUnits="userSpaceOnUse">
+                  <stop stop-color="#4A90E2" />
+                  <stop offset="1" stop-color="#2BC3A3" />
+                </linearGradient>
+              </defs>
+            </svg>
+          </div>
+          <h2>AI Symptom Analysis</h2>
+          <p>Describe your symptoms and get instant, localized health insights — trained for Nigerian conditions like
+            Malaria, Typhoid, Hypertension, and more.</p>
+        </div>
+        <div class="onboard-slide" id="slide-1">
+          <div class="onboard-illus illus-2">
+            <svg viewBox="0 0 200 160" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <rect x="50" y="20" width="100" height="115" rx="18" fill="#EAF6F6" />
+              <circle cx="100" cy="65" r="28" fill="url(#g2)" opacity="0.9" />
+              <text x="100" y="70" text-anchor="middle" fill="white" font-size="22" font-weight="800">💊</text>
+              <rect x="65" y="105" width="70" height="8" rx="4" fill="#2BC3A3" opacity="0.6" />
+              <rect x="75" y="120" width="50" height="6" rx="3" fill="#4A90E2" opacity="0.4" />
+              <defs>
+                <linearGradient id="g2" x1="72" y1="37" x2="128" y2="93" gradientUnits="userSpaceOnUse">
+                  <stop stop-color="#2BC3A3" />
+                  <stop offset="1" stop-color="#4A90E2" />
+                </linearGradient>
+              </defs>
+            </svg>
+          </div>
+          <h2>Smart Med Reminders</h2>
+          <p>Never miss a dose. Set offline-first medication alarms with personalized schedules, dosage guides, and
+            adherence tracking — no internet needed.</p>
+        </div>
+        <div class="onboard-slide" id="slide-2">
+          <div class="onboard-illus illus-3">
+            <svg viewBox="0 0 200 160" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <ellipse cx="100" cy="120" rx="70" ry="20" fill="#EAF6F6" />
+              <circle cx="100" cy="75" r="45" fill="url(#g3)" opacity="0.12" />
+              <circle cx="100" cy="75" r="31" fill="url(#g3)" opacity="0.22" />
+              <circle cx="100" cy="75" r="18" fill="url(#g3)" />
+              <circle cx="100" cy="75" r="6" fill="white" />
+              <circle cx="140" cy="58" r="11" fill="#FF6B6B" />
+              <circle cx="65" cy="95" r="9" fill="#2BC3A3" />
+              <circle cx="74" cy="48" r="8" fill="#4A90E2" />
+              <defs>
+                <linearGradient id="g3" x1="55" y1="30" x2="145" y2="120" gradientUnits="userSpaceOnUse">
+                  <stop stop-color="#4A90E2" />
+                  <stop offset="1" stop-color="#2BC3A3" />
+                </linearGradient>
+              </defs>
+            </svg>
+          </div>
+          <h2>Find Nearby Care</h2>
+          <p>Locate hospitals, pharmacies, NGO clinics, and MDCN-verified doctors near you — even offline. Book
+            appointments directly from the app.</p>
+        </div>
+      </div>
+      <div class="onboard-controls">
+        <div class="onboard-dots">
+          <span class="dot active" onclick="gotoSlide(0)"></span>
+          <span class="dot" onclick="gotoSlide(1)"></span>
+          <span class="dot" onclick="gotoSlide(2)"></span>
+        </div>
+        <div class="onboard-btns">
+          <button class="btn-ghost" onclick="navigateTo('screen-register')">Skip</button>
+          <button class="btn-primary" id="onboard-next-btn" onclick="nextSlide()">Next →</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- ======== REGISTRATION SCREEN ======== -->
+    <div id="screen-register" class="screen">
+      <div class="screen-header">
+        <button class="back-btn" onclick="navigateTo('screen-onboard')">← Back</button>
+        <div class="header-logo-small">
+          <svg viewBox="0 0 30 30" fill="none">
+            <path
+              d="M5 11C5 7.69 7.69 5 11 5C12.66 5 14.16 5.67 15 6.8C15.84 5.67 17.34 5 19 5C22.31 5 25 7.69 25 11C25 17.5 15 25 15 25C15 25 5 17.5 5 11Z"
+              fill="url(#hg)" />
+            <defs>
+              <linearGradient id="hg" x1="5" y1="5" x2="25" y2="25">
+                <stop stop-color="#4A90E2" />
+                <stop offset="1" stop-color="#2BC3A3" />
+              </linearGradient>
+            </defs>
+          </svg>
+          Lifeline
+        </div>
+      </div>
+      <div class="form-container">
+        <h2 class="form-title">Create Your Profile</h2>
+        <p class="form-sub">Your health data stays on your device, always private.</p>
+        <div class="form-group">
+          <label for="reg-name">Full Name</label>
+          <input type="text" id="reg-name" placeholder="e.g. Adaeze Okonkwo" autocomplete="name" />
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label for="reg-age">Age</label>
+            <input type="number" id="reg-age" placeholder="25" min="1" max="120" />
+          </div>
+          <div class="form-group">
+            <label for="reg-gender">Gender</label>
+            <select id="reg-gender">
+              <option value="">Select</option>
+              <option>Male</option>
+              <option>Female</option>
+              <option>Prefer not to say</option>
+            </select>
+          </div>
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label for="reg-genotype">Genotype</label>
+            <select id="reg-genotype">
+              <option value="">Select</option>
+              <option>AA</option>
+              <option>AS</option>
+              <option>SS</option>
+              <option>AC</option>
+              <option>SC</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label for="reg-blood">Blood Group</label>
+            <select id="reg-blood">
+              <option value="">Select</option>
+              <option>A+</option>
+              <option>A-</option>
+              <option>B+</option>
+              <option>B-</option>
+              <option>AB+</option>
+              <option>AB-</option>
+              <option>O+</option>
+              <option>O-</option>
+            </select>
+          </div>
+        </div>
+        <div class="form-group">
+          <label for="reg-conditions">Existing Conditions (optional)</label>
+          <input type="text" id="reg-conditions" placeholder="e.g. Hypertension, Diabetes, Sickle Cell" />
+        </div>
+        <div class="form-group">
+          <label for="reg-location">Your City / LGA</label>
+          <input type="text" id="reg-location" placeholder="e.g. Iperu-Remo, Ogun State" />
+        </div>
+        <div class="disclaimer-box">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#FF6B6B" stroke-width="2">
+            <circle cx="12" cy="12" r="10" />
+            <line x1="12" y1="8" x2="12" y2="12" />
+            <line x1="12" y1="16" x2="12.01" y2="16" />
+          </svg>
+          <span>Lifeline is not a substitute for professional medical advice. In emergencies, call
+            <strong>112</strong>.</span>
+        </div>
+        <button class="btn-primary btn-full" onclick="completeRegistration()">Complete Setup →</button>
+      </div>
+    </div>
+
+    <!-- ======== MAIN DASHBOARD ======== -->
+    <div id="screen-dashboard" class="screen">
+      <div class="dashboard-header">
+        <div class="dash-greeting">
+          <p id="dash-time-greeting">Good morning,</p>
+          <h2 id="dash-user-name">User</h2>
+        </div>
+        <div class="dash-header-right">
+          <div class="health-score-mini">
+            <span class="score-label">Health Score</span>
+            <span class="score-value" id="dash-score">78</span>
+          </div>
+          <button class="icon-btn" onclick="navigateTo('screen-vault')" title="Health Vault">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
+            </svg>
+          </button>
+          <button class="icon-btn" onclick="if(window.signOutUser) window.signOutUser(); else navigateTo('screen-splash');" title="Log Out" style="margin-left:4px">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+          </button>
+        </div>
+      </div>
+
+      <div class="quick-actions">
+        <h3 class="section-title">Quick Actions</h3>
+        <div class="qa-grid">
+          <button class="qa-card" id="qa-symptom" onclick="navigateTo('screen-ai')">
+            <div class="qa-icon" style="background:linear-gradient(135deg,#4A90E2,#6bb4f5)">
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2">
+                <circle cx="11" cy="11" r="8" />
+                <path d="m21 21-4.35-4.35" />
+                <path d="M11 8v6M8 11h6" />
+              </svg>
+            </div>
+            <span>AI Checker</span>
+          </button>
+          <button class="qa-card" id="qa-reminder" onclick="navigateTo('screen-reminder')">
+            <div class="qa-icon" style="background:linear-gradient(135deg,#2BC3A3,#5de3c8)">
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2">
+                <circle cx="12" cy="12" r="10" />
+                <polyline points="12 6 12 12 16 14" />
+              </svg>
+            </div>
+            <span>Med Reminders</span>
+          </button>
+          <button class="qa-card" id="qa-nearby" onclick="navigateTo('screen-nearby')">
+            <div class="qa-icon" style="background:linear-gradient(135deg,#FF6B6B,#ff9a9a)">
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2">
+                <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z" />
+                <circle cx="12" cy="10" r="3" />
+              </svg>
+            </div>
+            <span>Find Care</span>
+          </button>
+          <button class="qa-card" id="qa-doctor" onclick="navigateTo('screen-doctors')">
+            <div class="qa-icon" style="background:linear-gradient(135deg,#7c6fc9,#a89de8)">
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2">
+                <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" />
+                <circle cx="12" cy="7" r="4" />
+              </svg>
+            </div>
+            <span>Doctors</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- Pitch Strip -->
+      <div class="pitch-strip" onclick="navigateTo('screen-ai')">
+        <p>Vitality AI — Our Mission</p>
+        <p>"We are putting a doctor in every pocket and a lifeline in every home. Built for the 1 in 5,000 Nigerian
+          patients who can't easily reach a doctor."</p>
+      </div>
+
+      <div class="dashboard-alerts">
+        <h3 class="section-title">Today's Alerts</h3>
+        <div class="alert-card alert-reminder" id="dash-reminder-alert">
+          <div class="alert-icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#FF6B6B"
+              stroke-width="2">
+              <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9" />
+              <path d="M13.73 21a2 2 0 0 1-3.46 0" />
+            </svg></div>
+          <div class="alert-content">
+            <p class="alert-title">Medication Due</p>
+            <p class="alert-desc">No reminders set yet. <a href="#"
+                onclick="navigateTo('screen-reminder');return false;">Add one now →</a></p>
+          </div>
+        </div>
+        <div class="alert-card alert-info">
+          <div class="alert-icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#4A90E2"
+              stroke-width="2">
+              <circle cx="12" cy="12" r="10" />
+              <line x1="12" y1="8" x2="12" y2="12" />
+              <line x1="12" y1="16" x2="12.01" y2="16" />
+            </svg></div>
+          <div class="alert-content">
+            <p class="alert-title">Health Tip of the Day</p>
+            <p class="alert-desc">Drink at least 8 glasses of water daily. Dehydration is a common trigger for headaches
+              and fatigue — especially in Nigeria's heat.</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="emergency-strip">
+        <button class="emergency-btn" id="emergency-sos-btn" onclick="showEmergency()">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5">
+            <polygon points="7.86 2 16.14 2 22 7.86 22 16.14 16.14 22 7.86 22 2 16.14 2 7.86 7.86 2" />
+            <line x1="12" y1="8" x2="12" y2="12" />
+            <line x1="12" y1="16" x2="12.01" y2="16" />
+          </svg>
+          Emergency SOS
+        </button>
+      </div>
+
+      <!-- BOTTOM NAV -->
+      <nav class="bottom-nav">
+        <button class="nav-item active" onclick="navigateTo('screen-dashboard', this)">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z" />
+            <polyline points="9 22 9 12 15 12 15 22" />
+          </svg>
+          <span>Home</span>
+        </button>
+        <button class="nav-item" onclick="navigateTo('screen-ai', this)">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" />
+          </svg>
+          <span>AI Chat</span>
+        </button>
+        <button class="nav-item" onclick="navigateTo('screen-nearby', this)">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z" />
+            <circle cx="12" cy="10" r="3" />
+          </svg>
+          <span>Find Care</span>
+        </button>
+        <button class="nav-item" onclick="navigateTo('screen-vault', this)">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
+          </svg>
+          <span>Vault</span>
+        </button>
+      </nav>
+    </div>
+
+    <!-- ======== AI CHAT / SYMPTOM CHECKER ======== -->
+    <div id="screen-ai" class="screen">
+      <div class="screen-header">
+        <button class="back-btn" onclick="goBack()">← Back</button>
+        <h2 class="screen-title">AI Health Checker</h2>
+        <span></span>
+      </div>
+      <div class="ai-chat-wrap">
+        <div class="ai-messages" id="ai-messages">
+          <div class="ai-msg bot-msg">
+            <div class="bot-avatar">
+              <svg viewBox="0 0 30 30" fill="none">
+                <path
+                  d="M5 11C5 7.69 7.69 5 11 5C12.66 5 14.16 5.67 15 6.8C15.84 5.67 17.34 5 19 5C22.31 5 25 7.69 25 11C25 17.5 15 25 15 25C15 25 5 17.5 5 11Z"
+                  fill="url(#hg2)" />
+                <defs>
+                  <linearGradient id="hg2" x1="5" y1="5" x2="25" y2="25">
+                    <stop stop-color="#4A90E2" />
+                    <stop offset="1" stop-color="#2BC3A3" />
+                  </linearGradient>
+                </defs>
+              </svg>
+            </div>
+            <div class="msg-bubble">
+              <p>👋 Hello! I'm Vitality, your AI health assistant — trained for Nigerian health conditions.</p>
+              <p style="margin-top:8px">Describe your symptoms or ask a health question. For emergencies, call
+                <strong>112</strong> immediately.</p>
+            </div>
+          </div>
+          <div class="ai-msg bot-msg">
+            <div class="bot-avatar">
+              <svg viewBox="0 0 30 30" fill="none">
+                <path
+                  d="M5 11C5 7.69 7.69 5 11 5C12.66 5 14.16 5.67 15 6.8C15.84 5.67 17.34 5 19 5C22.31 5 25 7.69 25 11C25 17.5 15 25 15 25C15 25 5 17.5 5 11Z"
+                  fill="url(#hg3)" />
+                <defs>
+                  <linearGradient id="hg3" x1="5" y1="5" x2="25" y2="25">
+                    <stop stop-color="#4A90E2" />
+                    <stop offset="1" stop-color="#2BC3A3" />
+                  </linearGradient>
+                </defs>
+              </svg>
+            </div>
+            <div class="msg-bubble">
+              <p>Select a topic or type your symptoms below:</p>
+              <div class="quick-chips">
+                <button class="chip" onclick="sendPreset('I have a fever and body aches')">🌡️ Fever & Body
+                  Aches</button>
+                <button class="chip" onclick="sendPreset('I have a severe headache and vomiting')">🤕 Headache &
+                  Vomiting</button>
+                <button class="chip" onclick="sendPreset('I feel very weak and have yellow eyes')">👁️ Yellow Eyes &
+                  Weakness</button>
+                <button class="chip" onclick="sendPreset('I have stomach pain and diarrhea')">🤒 Stomach Pain</button>
+                <button class="chip" onclick="sendPreset('How do I manage hypertension?')">❤️ Hypertension</button>
+                <button class="chip" onclick="sendPreset('What are malaria symptoms?')">🦟 Malaria Info</button>
+                <button class="chip" onclick="sendPreset('Tell me about sickle cell crisis management')">💉 Sickle
+                  Cell</button>
+                <button class="chip" onclick="sendPreset('I have a cough and runny nose')">🤧 Cold & Flu</button>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="ai-input-bar">
+          <textarea id="ai-input" placeholder="Describe your symptoms..." rows="1" onkeydown="handleChatKey(event)"
+            oninput="autoResizeTextarea(this)"></textarea>
+          <button class="send-btn" id="ai-send-btn" onclick="sendMessage()">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5">
+              <line x1="22" y1="2" x2="11" y2="13" />
+              <polygon points="22 2 15 22 11 13 2 9 22 2" />
+            </svg>
+          </button>
+        </div>
+      </div>
+      <div class="ai-disclaimer">
+        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#FF6B6B" stroke-width="2">
+          <circle cx="12" cy="12" r="10" />
+          <line x1="12" y1="8" x2="12" y2="12" />
+          <line x1="12" y1="16" x2="12.01" y2="16" />
+        </svg>
+        AI insights are not medical diagnoses. Always consult a doctor for serious conditions.
+      </div>
+    </div>
+
+    <!-- ======== MEDICATION REMINDERS ======== -->
+    <div id="screen-reminder" class="screen">
+      <div class="screen-header">
+        <button class="back-btn" onclick="goBack()">← Back</button>
+        <h2 class="screen-title">Med Reminders</h2>
+        <button class="icon-btn" onclick="showAddReminder()" title="Add Reminder">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#2BC3A3" stroke-width="2.5">
+            <circle cx="12" cy="12" r="10" />
+            <line x1="12" y1="8" x2="12" y2="16" />
+            <line x1="8" y1="12" x2="16" y2="12" />
+          </svg>
+        </button>
+      </div>
+      <div class="reminder-container">
+        <div class="reminder-empty" id="reminder-empty">
+          <svg width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="#2BC3A3" stroke-width="1.5">
+            <circle cx="12" cy="12" r="10" />
+            <polyline points="12 6 12 12 16 14" />
+          </svg>
+          <p>No medication reminders yet.</p>
+          <button class="btn-primary" onclick="showAddReminder()">+ Add Medication</button>
+        </div>
+        <div class="reminders-list" id="reminders-list"></div>
+      </div>
+
+      <!-- Add Reminder Modal -->
+      <div class="modal-overlay" id="add-reminder-modal">
+        <div class="modal">
+          <div class="modal-header">
+            <h3>Add Medication</h3>
+            <button class="modal-close" onclick="hideAddReminder()">✕</button>
+          </div>
+          <div class="form-group">
+            <label>Medication Name</label>
+            <input type="text" id="rem-name" placeholder="e.g. Artemether, Amlodipine" />
+          </div>
+          <div class="form-row">
+            <div class="form-group">
+              <label>Dosage</label>
+              <input type="text" id="rem-dose" placeholder="e.g. 1 tablet" />
+            </div>
+            <div class="form-group">
+              <label>Frequency</label>
+              <select id="rem-freq">
+                <option>Once daily</option>
+                <option>Twice daily</option>
+                <option>Three times daily</option>
+                <option>Every 8 hours</option>
+                <option>Weekly</option>
+              </select>
+            </div>
+          </div>
+          <div class="form-group">
+            <label>Time</label>
+            <input type="time" id="rem-time" value="08:00" />
+          </div>
+          <div class="form-group">
+            <label>Notes (optional)</label>
+            <input type="text" id="rem-notes" placeholder="e.g. Take after meals" />
+          </div>
+          <button class="btn-primary btn-full" onclick="addReminder()">Save Reminder</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- ======== NEARBY CARE ======== -->
+    <div id="screen-nearby" class="screen">
+      <div class="screen-header">
+        <button class="back-btn" onclick="goBack()">← Back</button>
+        <h2 class="screen-title">Find Nearby Care</h2>
+        <span></span>
+      </div>
+      <div class="nearby-container">
+        <div class="filter-tabs" id="nearby-tabs">
+          <button class="filter-tab active" onclick="filterNearby('all', this)">All</button>
+          <button class="filter-tab" onclick="filterNearby('hospital', this)">🏥 Hospitals</button>
+          <button class="filter-tab" onclick="filterNearby('pharmacy', this)">💊 Pharmacies</button>
+          <button class="filter-tab" onclick="filterNearby('ngo', this)">🤝 NGOs</button>
+        </div>
+        <div class="location-bar">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#4A90E2" stroke-width="2">
+            <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z" />
+            <circle cx="12" cy="10" r="3" />
+          </svg>
+          <span id="nearby-location-label">Detecting your location...</span>
+        </div>
+        <div class="care-list" id="care-list"></div>
+      </div>
+    </div>
+
+    <!-- ======== DOCTORS ======== -->
+    <div id="screen-doctors" class="screen">
+      <div class="screen-header">
+        <button class="back-btn" onclick="goBack()">← Back</button>
+        <h2 class="screen-title">Verified Doctors</h2>
+        <span></span>
+      </div>
+      <div class="doctors-container">
+        <p class="section-sub">Connect with MDCN-verified doctors affiliated with our NGO partners. Teleconsultations
+          from ₦1,500.</p>
+        <div class="doctors-list" id="doctors-list"></div>
+      </div>
+
+      <!-- Book Appointment Modal -->
+      <div class="modal-overlay" id="book-modal">
+        <div class="modal">
+          <div class="modal-header">
+            <h3>Book Appointment</h3>
+            <button class="modal-close" onclick="hideBookModal()">✕</button>
+          </div>
+          <p id="book-doctor-name" style="color:#4A90E2;font-weight:600;margin-bottom:16px"></p>
+          <div class="form-group">
+            <label>Preferred Date</label>
+            <input type="date" id="book-date" />
+          </div>
+          <div class="form-group">
+            <label>Preferred Time</label>
+            <select id="book-time">
+              <option>9:00 AM</option>
+              <option>10:00 AM</option>
+              <option>11:00 AM</option>
+              <option>12:00 PM</option>
+              <option>2:00 PM</option>
+              <option>3:00 PM</option>
+              <option>4:00 PM</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label>Reason for Visit</label>
+            <textarea id="book-reason" placeholder="Briefly describe your concern..." rows="3"></textarea>
+          </div>
+          <p class="pay-note">💳 Payment via <strong>Paystack / Flutterwave</strong> after confirmation</p>
+          <button class="btn-primary btn-full" onclick="confirmBooking()">Confirm Appointment</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- ======== HEALTH VAULT ======== -->
+    <div id="screen-vault" class="screen">
+      <div class="screen-header">
+        <button class="back-btn" onclick="goBack()">← Back</button>
+        <h2 class="screen-title">Health Vault</h2>
+        <span></span>
+      </div>
+      <div class="vault-container">
+        <div class="vault-score-card">
+          <h3>Your Health Overview</h3>
+          <div class="score-ring-wrap">
+            <svg class="score-ring" viewBox="0 0 120 120">
+              <circle cx="60" cy="60" r="50" fill="none" stroke="rgba(255,255,255,.2)" stroke-width="10" />
+              <circle cx="60" cy="60" r="50" fill="none" stroke="white" stroke-width="10" stroke-dasharray="314"
+                stroke-dashoffset="69" stroke-linecap="round" transform="rotate(-90 60 60)"
+                style="transition: stroke-dashoffset .8s ease;" />
+              <text x="60" y="55" text-anchor="middle" fill="white" font-size="28" font-weight="800" dy="0.3em"
+                id="vault-score-num">78</text>
+              <text x="60" y="78" text-anchor="middle" fill="rgba(255,255,255,.7)" font-size="11">/ 100</text>
+            </svg>
+          </div>
+          <p id="vault-score-label" class="score-desc">Good – Keep up the healthy habits!</p>
+        </div>
+
+        <div class="vault-grid">
+          <div class="vault-item">
+            <span class="vault-label">Blood Group</span>
+            <span class="vault-value" id="vi-blood">–</span>
+          </div>
+          <div class="vault-item">
+            <span class="vault-label">Genotype</span>
+            <span class="vault-value" id="vi-genotype">–</span>
+          </div>
+          <div class="vault-item">
+            <span class="vault-label">Age</span>
+            <span class="vault-value" id="vi-age">–</span>
+          </div>
+          <div class="vault-item">
+            <span class="vault-label">Gender</span>
+            <span class="vault-value" id="vi-gender">–</span>
+          </div>
+        </div>
+
+        <div class="vault-section">
+          <h3 class="section-title">Medical History</h3>
+          <div class="form-group">
+            <label for="vault-conditions">Known Conditions</label>
+            <input type="text" id="vault-conditions" placeholder="e.g. Hypertension, Diabetes" />
+          </div>
+          <div class="form-group">
+            <label for="vault-allergies">Allergies</label>
+            <input type="text" id="vault-allergies" placeholder="e.g. Penicillin, Dust mites" />
+          </div>
+          <div class="form-group">
+            <label for="vault-prescriptions">Current Prescriptions</label>
+            <input type="text" id="vault-prescriptions" placeholder="e.g. Amlodipine 5mg daily" />
+          </div>
+          <button class="btn-secondary btn-full" onclick="saveVault()">Save Health Data</button>
+        </div>
+
+        <div class="vault-section">
+          <h3 class="section-title">Vital Logs</h3>
+          <div class="vitals-row">
+            <div class="vital-card">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#FF6B6B" stroke-width="2">
+                <path
+                  d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z" />
+              </svg>
+              <span class="vital-label">BP</span>
+              <input class="vital-input" id="vital-bp" placeholder="120/80" />
+            </div>
+            <div class="vital-card">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#4A90E2" stroke-width="2">
+                <circle cx="12" cy="12" r="10" />
+                <polyline points="12 6 12 12 16 14" />
+              </svg>
+              <span class="vital-label">Pulse</span>
+              <input class="vital-input" id="vital-pulse" placeholder="72 bpm" />
+            </div>
+            <div class="vital-card">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#2BC3A3" stroke-width="2">
+                <path d="M14 14.76V3.5a2.5 2.5 0 0 0-5 0v11.26a4.5 4.5 0 1 0 5 0z" />
+              </svg>
+              <span class="vital-label">Temp</span>
+              <input class="vital-input" id="vital-temp" placeholder="37°C" />
+            </div>
+            <div class="vital-card">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#7c6fc9" stroke-width="2">
+                <path
+                  d="M20.38 8.57l-1.23 1.85a8 8 0 0 1-.22 7.58H5.07A8 8 0 0 1 15.58 6.85l1.85-1.23A10 10 0 1 0 20.38 8.57z" />
+                <path
+                  d="M10.59 5.27L7 8.87 4.14 11.7a1 1 0 0 0 0 1.41l2.39 2.39a1 1 0 0 0 1.41 0L12 11.41l3.59-3.59L12 4.23a1 1 0 0 0-1.41 1.04z" />
+              </svg>
+              <span class="vital-label">Weight</span>
+              <input class="vital-input" id="vital-weight" placeholder="70 kg" />
+            </div>
+          </div>
+          <button class="btn-secondary btn-full" style="margin-top:12px" onclick="logVitals()">Log Vitals</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- ======== EMERGENCY MODAL ======== -->
+    <div class="modal-overlay" id="emergency-modal">
+      <div class="modal emergency-modal">
+        <div class="emergency-header">
+          <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#FF6B6B" stroke-width="2.5">
+            <polygon points="7.86 2 16.14 2 22 7.86 22 16.14 16.14 22 7.86 22 2 16.14 2 7.86 7.86 2" />
+            <line x1="12" y1="8" x2="12" y2="12" />
+            <line x1="12" y1="16" x2="12.01" y2="16" />
+          </svg>
+          <h3>Emergency SOS</h3>
+        </div>
+        <p>Select an emergency service to contact immediately:</p>
+        <div class="emer-btns">
+          <a class="emer-btn" href="tel:112">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2">
+              <path
+                d="M22 16.92v3a2 2 0 01-2.18 2 19.79 19.79 0 01-8.63-3.07A19.5 19.5 0 013.07 9.8 19.79 19.79 0 01.06 1.18 2 2 0 012 .02h3a2 2 0 012 1.72c.127.96.361 1.903.7 2.81a2 2 0 01-.45 2.11L6.09 7.91a16 16 0 006 6l1.27-1.27a2 2 0 012.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0122 14.92v2z" />
+            </svg>
+            Call 112 (Nigeria Emergency)
+          </a>
+          <a class="emer-btn emer-amb" href="tel:199">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2">
+              <rect x="1" y="3" width="15" height="13" rx="1" />
+              <path d="M16 8h4l3 3v5h-7V8z" />
+              <circle cx="5.5" cy="18.5" r="2.5" />
+              <circle cx="18.5" cy="18.5" r="2.5" />
+            </svg>
+            LASAMBUS Ambulance (199)
+          </a>
+          <a class="emer-btn emer-poison" href="tel:+2348022258436">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2">
+              <circle cx="12" cy="12" r="10" />
+              <line x1="12" y1="8" x2="12" y2="12" />
+              <line x1="12" y1="16" x2="12.01" y2="16" />
+            </svg>
+            NAFDAC Hotline
+          </a>
+        </div>
+        <div class="nearby-hospitals-mini" id="emer-hospitals">
+          <p class="mini-title">📍 Nearest Hospitals (preloaded from your location):</p>
+          <div class="mini-hosp-list" id="emer-hosp-list"></div>
+        </div>
+        <button class="btn-ghost btn-full" onclick="hideEmergency()">Close</button>
+      </div>
+    </div>
+
+    <!-- ======== EMAIL AUTH MODAL ======== -->
+  <div class="modal-overlay" id="email-auth-modal">
+    <div class="modal">
+      <div class="modal-header">
+        <h3>Email Sign In</h3>
+        <button class="modal-close" onclick="document.getElementById('email-auth-modal').classList.remove('open')">✕</button>
+      </div>
+      <div class="form-group">
+        <label>Email Address</label>
+        <input type="email" id="auth-email" placeholder="e.g. hello@lifeline.com" />
+      </div>
+      <div class="form-group">
+        <label>Password</label>
+        <input type="password" id="auth-password" placeholder="Min 6 characters" />
+      </div>
+      <div style="display:flex; gap:10px; margin-top:16px;">
+        <button class="btn-primary" style="flex:1" onclick="if(window.signInEmail) window.signInEmail()">Log In</button>
+        <button class="btn-secondary" style="flex:1" onclick="if(window.signUpEmail) window.signUpEmail()">Sign Up</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ======== TOAST NOTIFICATION ======== -->
+    <div class="toast" id="toast"></div>
+
+  </div><!-- end #app-root -->
+
+  <!-- Core App Logic -->
+  <script src="app.js"></script>
+  <!-- Firebase Auth & Sync hooks -->
+  <script type="module" src="firebase-auth.js"></script>
+</body>
+
+</html>
