@@ -563,7 +563,6 @@ button { cursor: pointer; border: none; background: transparent; font-family: va
    ══════════════════════════════════════════════════════ */
 #screen-dashboard {
   background: var(--bg);
-  padding-bottom: calc(var(--nav-h) + 16px);
 }
 
 .dashboard-header {
@@ -673,12 +672,9 @@ button { cursor: pointer; border: none; background: transparent; font-family: va
 
 /* ── BOTTOM NAV ─────────────────────────────────────── */
 .bottom-nav {
-  position: fixed;
+  position: sticky;
   bottom: 0;
-  left: 50%;
-  transform: translateX(-50%);
   width: 100%;
-  max-width: var(--max-w);
   height: var(--nav-h);
   background: var(--white);
   border-top: 1px solid var(--border);
